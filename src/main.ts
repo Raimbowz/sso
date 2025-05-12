@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { CacheInterceptor } from '@nestjs/cache-manager';
 import { Reflector } from '@nestjs/core';
 
 async function bootstrap() {
@@ -25,11 +24,7 @@ async function bootstrap() {
     transform: true,
     forbidNonWhitelisted: true,
   }));
-
-  // Глобальный интерцептор кэша
-  const cacheManager = app.get('CACHE_MANAGER');
-  const reflector = app.get(Reflector);
-  app.useGlobalInterceptors(new CacheInterceptor(cacheManager, reflector));
+  
 
   // Set up Swagger documentation
   const config = new DocumentBuilder()

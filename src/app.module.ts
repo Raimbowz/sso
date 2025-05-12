@@ -7,6 +7,8 @@ import { DatabaseModule } from './config/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -23,6 +25,12 @@ import * as redisStore from 'cache-manager-redis-store';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor,
+    },
+  ],
 })
 export class AppModule {}
