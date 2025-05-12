@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigModule } from '../config/config.module';
 import { AppConfigService } from '../config/config.service';
+import { CacheHttpClientService } from '../cache-http-client.service';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { AppConfigService } from '../config/config.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  providers: [AuthService, JwtStrategy, CacheHttpClientService],
+  exports: [AuthService, CacheHttpClientService],
 })
 export class AuthModule {} 
