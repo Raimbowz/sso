@@ -17,7 +17,7 @@ import { ConfigModule } from './config.module';
         database: configService.dbName,
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: configService.dbSynchronize, // Only for development
-        logging: configService.isDevelopment,
+        logging: false,
       }),
     }),
   ],

@@ -11,6 +11,12 @@ async function bootstrap() {
     new FastifyAdapter()
   );
 
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+
   // Apply validation pipe globally
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
@@ -35,7 +41,7 @@ async function bootstrap() {
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('api', app, document);
 
   // Start the server on port 3001
   await app.listen(3001, '0.0.0.0');
