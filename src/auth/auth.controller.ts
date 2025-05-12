@@ -6,6 +6,10 @@ import {
   Post,
   Req,
   UseGuards,
+  Delete,
+  Param,
+  ParseIntPipe,
+  Inject,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,6 +26,8 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 class ValidateTokenDto {
   token: string;
@@ -33,6 +39,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Post('register')
@@ -124,5 +131,29 @@ export class AuthController {
   })
   async logout(@Req() req: { user: JwtPayload }): Promise<void> {
     await this.authService.logout(req.user.sub);
+  }
+
+  @Delete('cache/login/:userId')
+  async clearLoginCache(@Param('userId', ParseIntPipe) userId: number) {
+    await this.cacheManager.del(`auth_login_${userId}`);
+    return { message: `Кэш логина пользователя ${userId} сброшен` };
+  }
+
+  @Delete('cache/refresh/:userId')
+  async clearRefreshCache(@Param('userId', ParseIntPipe) userId: number) {
+    await this.cacheManager.del(`auth_refresh_${userId}`);
+    return { message: `Кэш refresh пользователя ${userId} сброшен` };
+  }
+
+  @Delete('cache/validate/:userId')
+  async clearValidateCache(@Param('userId', ParseIntPipe) userId: number) {
+    await this.cacheManager.del(`auth_validate_${userId}`);
+    return { message: `Кэш validate пользователя ${userId} сброшен` };
+  }
+
+  @Delete('cache/logout/:userId')
+  async clearLogoutCache(@Param('userId', ParseIntPipe) userId: number) {
+    await this.cacheManager.del(`auth_logout_${userId}`);
+    return { message: `Кэш logout пользователя ${userId} сброшен` };
   }
 } 

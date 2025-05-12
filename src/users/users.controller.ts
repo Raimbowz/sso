@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Inject,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,13 +27,18 @@ import { User, UserRole } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('access-token')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -76,5 +82,23 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.remove(id);
+  }
+
+  @Delete('cache/all')
+  async clearAllUsersCache() {
+    await this.cacheManager.del('users_all');
+    return { message: 'Кэш всех пользователей сброшен' };
+  }
+
+  @Delete('cache/:id')
+  async clearUserCache(@Param('id', ParseIntPipe) id: number) {
+    await this.cacheManager.del(`users_id_${id}`);
+    return { message: `Кэш пользователя с id ${id} сброшен` };
+  }
+
+  @Delete('cache/find')
+  async clearFindAllCache() {
+    await this.cacheManager.del('users_findAll');
+    return { message: 'Кэш findAll пользователей сброшен' };
   }
 } 
