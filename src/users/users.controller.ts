@@ -29,6 +29,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CacheHttpClientService } from '../cache-http-client.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -37,7 +38,7 @@ import { Cache } from 'cache-manager';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly cacheHttpClient: CacheHttpClientService,
   ) {}
 
   @Post()
@@ -52,16 +53,24 @@ export class UsersController {
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [User], description: 'List of all users' })
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  async findAll(): Promise<User[]> {
+    return this.cacheHttpClient.getOrSet(
+      'users_all',
+      86400, // 1 день
+      () => this.usersService.findAll(),
+    );
   }
 
   @Get(':id')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiOkResponse({ type: User, description: 'The user with the specified ID' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
+    return this.cacheHttpClient.getOrSet(
+      `user_${id}`,
+      86400, // 1 день
+      () => this.usersService.findOne(id),
+    );
   }
 
   @Patch(':id')
@@ -86,19 +95,19 @@ export class UsersController {
 
   @Delete('cache/all')
   async clearAllUsersCache() {
-    await this.cacheManager.del('users_all');
+    await this.cacheHttpClient['cacheManager'].del('users_all');
     return { message: 'Кэш всех пользователей сброшен' };
   }
 
   @Delete('cache/:id')
   async clearUserCache(@Param('id', ParseIntPipe) id: number) {
-    await this.cacheManager.del(`users_id_${id}`);
+    await this.cacheHttpClient['cacheManager'].del(`user_${id}`);
     return { message: `Кэш пользователя с id ${id} сброшен` };
   }
 
   @Delete('cache/find')
   async clearFindAllCache() {
-    await this.cacheManager.del('users_findAll');
+    await this.cacheHttpClient['cacheManager'].del('users_all');
     return { message: 'Кэш findAll пользователей сброшен' };
   }
 } 

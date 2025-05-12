@@ -28,6 +28,7 @@ import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { CacheHttpClientService } from '../cache-http-client.service';
 
 class ValidateTokenDto {
   token: string;
@@ -40,6 +41,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly cacheHttpClient: CacheHttpClientService,
   ) {}
 
   @Post('register')
@@ -71,7 +73,12 @@ export class AuthController {
     description: 'Invalid credentials',
   })
   async login(@Body() loginDto: LoginDto): Promise<TokenDto> {
-    return this.authService.login(loginDto);
+    const key = `auth_login_${loginDto.email}`;
+    return this.cacheHttpClient.getOrSet(
+      key,
+      86400,
+      () => this.authService.login(loginDto),
+    );
   }
 
   @Post('refresh')
@@ -87,18 +94,18 @@ export class AuthController {
     description: 'Invalid refresh token',
   })
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto): Promise<TokenDto> {
-    try {
-      const decoded = this.authService['jwtService'].decode(
-        refreshTokenDto.refreshToken,
-      ) as JwtPayload;
-
-      return this.authService.refreshTokens(
+    const decoded = this.authService['jwtService'].decode(
+      refreshTokenDto.refreshToken,
+    ) as JwtPayload;
+    const key = `auth_refresh_${decoded.sub}`;
+    return this.cacheHttpClient.getOrSet(
+      key,
+      86400,
+      () => this.authService.refreshTokens(
         decoded.sub,
         refreshTokenDto.refreshToken,
-      );
-    } catch (error) {
-      throw new Error('Invalid refresh token');
-    }
+      ),
+    );
   }
 
   @Post('validate-token')
@@ -113,7 +120,12 @@ export class AuthController {
     description: 'Invalid token',
   })
   async validateToken(@Body() validateTokenDto: ValidateTokenDto): Promise<{ valid: boolean; user?: JwtPayload }> {
-    return this.authService.validateToken(validateTokenDto.token);
+    const key = `auth_validate_${validateTokenDto.token}`;
+    return this.cacheHttpClient.getOrSet(
+      key,
+      86400,
+      () => this.authService.validateToken(validateTokenDto.token),
+    );
   }
 
   @Post('logout')
@@ -135,25 +147,25 @@ export class AuthController {
 
   @Delete('cache/login/:userId')
   async clearLoginCache(@Param('userId', ParseIntPipe) userId: number) {
-    await this.cacheManager.del(`auth_login_${userId}`);
+    await this.cacheHttpClient['cacheManager'].del(`auth_login_${userId}`);
     return { message: `Кэш логина пользователя ${userId} сброшен` };
   }
 
   @Delete('cache/refresh/:userId')
   async clearRefreshCache(@Param('userId', ParseIntPipe) userId: number) {
-    await this.cacheManager.del(`auth_refresh_${userId}`);
+    await this.cacheHttpClient['cacheManager'].del(`auth_refresh_${userId}`);
     return { message: `Кэш refresh пользователя ${userId} сброшен` };
   }
 
   @Delete('cache/validate/:userId')
   async clearValidateCache(@Param('userId', ParseIntPipe) userId: number) {
-    await this.cacheManager.del(`auth_validate_${userId}`);
+    await this.cacheHttpClient['cacheManager'].del(`auth_validate_${userId}`);
     return { message: `Кэш validate пользователя ${userId} сброшен` };
   }
 
   @Delete('cache/logout/:userId')
   async clearLogoutCache(@Param('userId', ParseIntPipe) userId: number) {
-    await this.cacheManager.del(`auth_logout_${userId}`);
+    await this.cacheHttpClient['cacheManager'].del(`auth_logout_${userId}`);
     return { message: `Кэш logout пользователя ${userId} сброшен` };
   }
 } 
