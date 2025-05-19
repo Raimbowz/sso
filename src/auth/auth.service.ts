@@ -33,11 +33,13 @@ export class AuthService {
     const user = await this.validateUser(loginDto.email, loginDto.password);
     
     const tokens = await this.getTokens(user);
-    console.log(user);
-    
+ 
     await this.usersService.setRefreshToken(user.id, tokens.refreshToken);
     
-    return tokens;
+    return {
+      ...tokens,
+      user: user
+    };
   }
 
   async refreshTokens(userId: number, refreshToken: string): Promise<TokenDto> {
