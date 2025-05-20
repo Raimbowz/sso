@@ -43,7 +43,7 @@ export class UsersController {
   ) {}
 
   @Post()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Create a new user' })
   @ApiCreatedResponse({ type: User, description: 'The user has been successfully created' })
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -51,7 +51,7 @@ export class UsersController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [User], description: 'List of all users' })
   async findAll(): Promise<User[]> {
@@ -75,7 +75,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiOkResponse({ type: User, description: 'The user with the specified ID' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
@@ -87,7 +87,7 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Update a user by ID' })
   @ApiOkResponse({ type: User, description: 'The updated user' })
   update(
@@ -98,7 +98,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Delete a user by ID' })
   @ApiNoContentResponse({ description: 'The user has been successfully deleted' })
   @HttpCode(HttpStatus.NO_CONTENT)
