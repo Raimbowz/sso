@@ -1,7 +1,5 @@
 import { Controller, Get, Delete, Param, Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { AppService } from './app.service';
-import { Cache } from 'cache-manager';
 
 @Controller()
 export class AppController {

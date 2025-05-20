@@ -6,20 +6,20 @@ import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './config/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-// import * as redisStore from 'cache-manager-redis-store';
-// import { APP_INTERCEPTOR } from '@nestjs/core';
-// import { CacheInterceptor } from '@nestjs/cache-manager';
-// import { CacheHttpClientService } from './cache-http-client.service';
+import * as redisStore from 'cache-manager-redis-store';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+import { CacheHttpClientService } from './cache-http-client.service';
 
 @Module({
   imports: [
-    // CacheModule.register({
-    //   isGlobal: true,
-    //   store: redisStore,
-    //   host: process.env.REDIS_HOST || 'redis',
-    //   port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
-    //   ttl: 86400, // 1 день в секундах
-    // }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST || 'redis',
+      port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
+      ttl: 86400, // 1 день в секундах
+    }),
     ConfigModule,
     DatabaseModule,
     UsersModule,
@@ -28,11 +28,11 @@ import { AuthModule } from './auth/auth.module';
   controllers: [AppController],
   providers: [
     AppService,
-   // CacheHttpClientService,
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: CacheInterceptor,
-    // },
+    CacheHttpClientService,
+     {
+       provide: APP_INTERCEPTOR,
+       useClass: CacheInterceptor,
+    },
   ],
 })
 export class AppModule {}
