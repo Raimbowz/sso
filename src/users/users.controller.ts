@@ -74,6 +74,15 @@ export class UsersController {
     );
   }
 
+  @Get('/by-token')
+  @ApiOperation({ summary: 'Get a user by token' })
+  @ApiOkResponse({ type: User, description: 'The user with the specified token' })
+  async getProfileByToken(@Req() req: Request): Promise<User | null> {
+    const token = req.headers['authorization'].split(' ')[1];
+    const user = await this.usersService.findByToken(token);
+    return user;
+  }
+
   @Get(':id')
   @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Get a user by ID' })

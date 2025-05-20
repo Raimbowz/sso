@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import * as jwt from 'jsonwebtoken';
 @Injectable()
 export class UsersService {
   constructor(
@@ -44,6 +44,15 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
+  async findByToken(token: string): Promise<User | null> {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string ) as { id: number };
+    const user = await this.usersRepository.findOne({ where: { id: decodedToken.id } });
+    if (!user) {
+      throw new NotFoundException(`User with token ${token} not found`);
     }
     return user;
   }
