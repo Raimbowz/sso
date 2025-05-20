@@ -108,10 +108,12 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: 'Invalid token',
+    description: 'Invalid token or token expired',
   })
   async validateToken(@Body() validateTokenDto: ValidateTokenDto): Promise<{ valid: boolean; user?: JwtPayload }> {
     //const key = `auth_validate_${validateTokenDto.token}`;
+
+
     return this.authService.validateToken(validateTokenDto.token)
   }
 
