@@ -73,12 +73,7 @@ export class AuthController {
     description: 'Invalid credentials',
   })
   async login(@Body() loginDto: LoginDto): Promise<TokenDto> {
-    const key = `auth_login_${loginDto.email}`;
-    return this.cacheHttpClient.getOrSet(
-      key,
-      86400,
-      () => this.authService.login(loginDto),
-    );
+    return this.authService.login(loginDto)
   }
 
   @Post('refresh')
@@ -98,14 +93,10 @@ export class AuthController {
       refreshTokenDto.refreshToken,
     ) as JwtPayload;
     const key = `auth_refresh_${decoded.email} `;
-    return this.cacheHttpClient.getOrSet(
-      key,
-      86400,
-      () => this.authService.refreshTokens(
-        decoded.sub,
-        refreshTokenDto.refreshToken,
-      ),
-    );
+    return this.authService.refreshTokens(
+      decoded.sub,
+      refreshTokenDto.refreshToken,
+    )
   }
 
   @Post('validate-token')
@@ -120,12 +111,8 @@ export class AuthController {
     description: 'Invalid token',
   })
   async validateToken(@Body() validateTokenDto: ValidateTokenDto): Promise<{ valid: boolean; user?: JwtPayload }> {
-    const key = `auth_validate_${validateTokenDto.token}`;
-    return this.cacheHttpClient.getOrSet(
-      key,
-      86400,
-      () => this.authService.validateToken(validateTokenDto.token),
-    );
+    //const key = `auth_validate_${validateTokenDto.token}`;
+    return this.authService.validateToken(validateTokenDto.token)
   }
 
   @Post('logout')
