@@ -26,10 +26,7 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { CacheHttpClientService } from '../cache-http-client.service';
-
+ 
 class ValidateTokenDto {
   token: string;
 }
