@@ -74,6 +74,7 @@ export class UsersService {
 
     // Hash password if it's being updated
     if (updateUserDto.password) {
+      console.log(updateUserDto.password)
       updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
 
