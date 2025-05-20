@@ -6,10 +6,10 @@ import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './config/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
-import * as redisStore from 'cache-manager-redis-store';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import { CacheHttpClientService } from './cache-http-client.service';
+// import * as redisStore from 'cache-manager-redis-store';
+// import { APP_INTERCEPTOR } from '@nestjs/core';
+// import { CacheInterceptor } from '@nestjs/cache-manager';
+// import { CacheHttpClientService } from './cache-http-client.service';
 
 @Module({
   imports: [
@@ -28,11 +28,11 @@ import { CacheHttpClientService } from './cache-http-client.service';
   controllers: [AppController],
   providers: [
     AppService,
-    CacheHttpClientService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
+   // CacheHttpClientService,
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: CacheInterceptor,
+    // },
   ],
 })
 export class AppModule {}
