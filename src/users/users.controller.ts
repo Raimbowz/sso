@@ -12,6 +12,8 @@ import {
   HttpStatus,
   Inject,
   Req,
+  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -66,9 +68,22 @@ export class UsersController {
   @Get('/by-token')
   @ApiOperation({ summary: 'Get a user by token' })
   @ApiOkResponse({ type: User, description: 'The user with the specified token' })
-  async getProfileByToken(@Req() req: Request): Promise<User | null> {
-    const token = req.headers['authorization'].split(' ')[1];
-    const user = await this.usersService.findByToken(token);
+  async getProfileByToken(@Req() req: any): Promise<User | null> {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      throw new UnauthorizedException('No token provided');
+    }
+    const token = authHeader.replace('Bearer ', '');
+    let payload: any;
+    try {
+      payload = require('jsonwebtoken').verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+      throw new UnauthorizedException('Invalid token');
+    }
+    const user = await this.usersService.findOne(payload.id || payload.sub);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return user;
   }
 
