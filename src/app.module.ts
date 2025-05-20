@@ -13,13 +13,13 @@ import { CacheHttpClientService } from './cache-http-client.service';
 
 @Module({
   imports: [
-    CacheModule.register({
-      isGlobal: true,
-      store: redisStore,
-      host: process.env.REDIS_HOST || 'redis',
-      port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
-      ttl: 86400, // 1 день в секундах
-    }),
+    // CacheModule.register({
+    //   isGlobal: true,
+    //   store: redisStore,
+    //   host: process.env.REDIS_HOST || 'redis',
+    //   port: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
+    //   ttl: 86400, // 1 день в секундах
+    // }),
     ConfigModule,
     DatabaseModule,
     UsersModule,

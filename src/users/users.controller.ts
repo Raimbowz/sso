@@ -39,7 +39,7 @@ import { CacheHttpClientService } from '../cache-http-client.service';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly cacheHttpClient: CacheHttpClientService,
+ 
   ) {}
 
   @Post()
@@ -55,11 +55,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [User], description: 'List of all users' })
   async findAll(): Promise<User[]> {
-    return this.cacheHttpClient.getOrSet(
-      'users_all',
-      86400, // 1 день
-      () => this.usersService.findAll(),
-    );
+    return this.usersService.findAll()
   }
 
   @Get('profile/:id')
@@ -107,21 +103,21 @@ export class UsersController {
     return this.usersService.remove(id);
   }
 
-  @Delete('cache/all')
-  async clearAllUsersCache() {
-    await this.cacheHttpClient['cacheManager'].del('users_all');
-    return { message: 'Кэш всех пользователей сброшен' };
-  }
+  // @Delete('cache/all')
+  // async clearAllUsersCache() {
+  //   await this.cacheHttpClient['cacheManager'].del('users_all');
+  //   return { message: 'Кэш всех пользователей сброшен' };
+  // }
 
-  @Delete('cache/:id')
-  async clearUserCache(@Param('id', ParseIntPipe) id: number) {
-    await this.cacheHttpClient['cacheManager'].del(`user_${id}`);
-    return { message: `Кэш пользователя с id ${id} сброшен` };
-  }
+  // @Delete('cache/:id')
+  // async clearUserCache(@Param('id', ParseIntPipe) id: number) {
+  //   await this.cacheHttpClient['cacheManager'].del(`user_${id}`);
+  //   return { message: `Кэш пользователя с id ${id} сброшен` };
+  // }
 
-  @Delete('cache/find')
-  async clearFindAllCache() {
-    await this.cacheHttpClient['cacheManager'].del('users_all');
-    return { message: 'Кэш findAll пользователей сброшен' };
-  }
+  // @Delete('cache/find')
+  // async clearFindAllCache() {
+  //   await this.cacheHttpClient['cacheManager'].del('users_all');
+  //   return { message: 'Кэш findAll пользователей сброшен' };
+  // }
 } 
