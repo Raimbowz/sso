@@ -7,7 +7,7 @@ import { Cache } from 'cache-manager';
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    //@Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get()
@@ -15,10 +15,10 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Delete('cache/user/:userId')
-  async clearUserCache(@Param('userId') userId: string) {
-    const cacheKey = `user_${userId}`;
-    await this.cacheManager.del(cacheKey);
-    return { message: `Кэш для пользователя ${userId} сброшен` };
-  }
+  // @Delete('cache/user/:userId')
+  // async clearUserCache(@Param('userId') userId: string) {
+  //   const cacheKey = `user_${userId}`;
+  //   await this.cacheManager.del(cacheKey);
+  //   return { message: `Кэш для пользователя ${userId} сброшен` };
+  // }
 }
