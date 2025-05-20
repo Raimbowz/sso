@@ -67,11 +67,7 @@ export class UsersController {
   @ApiOkResponse({ type: User, description: 'The user with the specified ID' })
   async getProfile(@Param('id', ParseIntPipe) id: number): Promise<User> {
     
-    return this.cacheHttpClient.getOrSet(
-      `user_${id}`,
-      86400, // 1 день
-      () => this.usersService.findOne(id),
-    );
+    return this.usersService.findOne(id)
   }
 
   @Get('/by-token')
@@ -88,11 +84,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiOkResponse({ type: User, description: 'The user with the specified ID' })
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
-    return this.cacheHttpClient.getOrSet(
-      `user_${id}`,
-      86400, // 1 день
-      () => this.usersService.findOne(id),
-    );
+    return this.usersService.findOne(id)
   }
 
   @Patch(':id')

@@ -97,7 +97,7 @@ export class AuthController {
     const decoded = this.authService['jwtService'].decode(
       refreshTokenDto.refreshToken,
     ) as JwtPayload;
-    const key = `auth_refresh_${decoded.sub}`;
+    const key = `auth_refresh_${decoded.email} `;
     return this.cacheHttpClient.getOrSet(
       key,
       86400,
