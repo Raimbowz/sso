@@ -53,7 +53,8 @@ export class UsersController {
   @Roles(UserRole.ADMIN,UserRole.CREATOR)
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({ type: [User], description: 'List of all users' })
-  async findAll(): Promise<User[]> {
+  async findAll(@Req() req: any): Promise<User[]> {
+ 
     return this.usersService.findAll()
   }
 
@@ -66,6 +67,7 @@ export class UsersController {
   }
 
   @Get('/by-token')
+  @Roles(UserRole.ADMIN,UserRole.CREATOR, UserRole.USER, UserRole.MODERATOR, UserRole.DEVELOPER, UserRole.PARTNER)
   @ApiOperation({ summary: 'Get a user by token' })
   @ApiOkResponse({ type: User, description: 'The user with the specified token' })
   async getProfileByToken(@Req() req: any): Promise<User | null> {
